@@ -17,7 +17,6 @@ void lanzarHilos();
 int iEncontro = 0;
 int iArreglo[N];
 int iNumeroABuscar;
-//int posicionDelElemento;
 
 int main(int argc, char const *argv[])
 {
@@ -35,12 +34,14 @@ int main(int argc, char const *argv[])
 		printf("(%i)[%i]\n",i+1,iArreglo[i]);
 	}
 
-	//Se busca un elemento en el arreglo
+	//Se pide el elemento a buscar en el arreglo
 	printf("Ingrese numero a buscar: ");
 	scanf("%i",&iNumeroABuscar);
 
+	//se ejecuta el procedimiento para buscar el elemento y obtener la posicion en el arreglo
 	int posicionDelElemento = fiBusquedaSecuencialHilos();
 
+	//obtenida la posicion, se evalua si es correcta. Si lo es, se imprimira la posicion.
 	if(posicionDelElemento == 0)
 		printf("No se encontro el elemento\n");
 	else
@@ -49,10 +50,14 @@ int main(int argc, char const *argv[])
 	exit(0);
 }
 
+//funcion pedida para buscar el elemento en el arreglo
 int fiBusquedaSecuencialHilos()
 {
   	int posicion = -1;
+  	//funcion que lanza los 4 hilos para hacer la busqueda,
+  	//se hace paso de valor por referencia para que sea usada por los 4 hilos y alguno la modifique
   	lanzarHilos(&posicion);
+  	//habiendose modificado la variable posicion en alguno de los hilos se retorna la misma.
   	return posicion + 1;
 }
 
@@ -66,6 +71,7 @@ void lanzarHilos( int *p)
   	int * pos = p;
   	int iHilo1, iHilo2, iHilo3, iHilo4;
 
+  	//Se crean los hilos en busqueda del elemento
   	iHilo1 = pthread_create( &hilo1, NULL, hiloBusqueda1, (void *)pos );
   	iHilo2 = pthread_create( &hilo2, NULL, hiloBusqueda2, (void *)pos );
   	iHilo3 = pthread_create( &hilo3, NULL, hiloBusqueda3, (void *)pos );
@@ -77,6 +83,7 @@ void lanzarHilos( int *p)
  	pthread_join( hilo3, NULL );
   		
 }
+
 void * hiloBusqueda1( void *h )
 {
 	int * posEncontrado = (int *) h;
@@ -133,7 +140,7 @@ void hiloBusqueda4(int *p)
 		i++;
 	}
 }
-
+//funcion para saber si un numero ya esta en el arreglo y asi evitar ingresar alguno repetido
 int fiRepetido(int iNumero)
 {
 	int i = 0;
