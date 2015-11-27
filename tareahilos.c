@@ -1,5 +1,7 @@
 /*	Grupo 04 - Sistemas Operativos
 	Denis Morales 07200100
+	Franco Ccopa
+	Pedro Cori
  */
 
 #include <stdio.h>
