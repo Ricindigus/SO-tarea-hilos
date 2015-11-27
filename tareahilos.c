@@ -28,7 +28,7 @@ int main(int argc, char const *argv[])
 	printf("Ingrese numero a buscar: ");
 	scanf("%i",&iNumeroABuscar);
 	int p = fiBusquedaSecuencial(iNumeroABuscar,iArreglo,N);
-	if(p == -1)
+	if(p < 1)
 		printf("El elemento no esta en el arreglo\n");
 	else
 		printf("La posicion del numero buscado es: %i\n",p );
@@ -64,6 +64,6 @@ int fiBusquedaSecuencial(int iNumero,int iArreglo[], int tamArreglo)
 		}
 		i++;
 	}
-	return posicion;
+	return posicion + 1;
 }
 
