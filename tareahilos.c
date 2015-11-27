@@ -1,47 +1,48 @@
 /*	Grupo 04 - Sistemas Operativos
-	Denis Morales 07200100
-	Franco Ccopa
-	Pedro Cori
+	Morales Retamozo, Denis Ricardo		07200100
+	Cori Amesquita, Pedro				13200152
+	Ccopa Marín, Franco Aldair			13200145
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 
-#define N 4096
+#define TAMANIO 4096
 
 
 int fiRepetido(int iNumero);
 int fiBusquedaSecuencialHilos();
 
-void * hiloBusqueda1( void *h );
-void * hiloBusqueda2( void *h );
-void * hiloBusqueda3( void *h );
-void hiloBusqueda4( int *p);
-void lanzarHilos();
+void * fpvhiloBusqueda1( void *h );
+void * fpvhiloBusqueda2( void *h );
+void * fpvhiloBusqueda3( void *h );
+void fvhiloBusqueda4( int *p);
+void fvlanzarHilos();
 
 int iEncontro = 0;
-int iArreglo[N];
+int aiArreglo[TAMANIO];
 int iNumeroABuscar;
 
 int main(int argc, char const *argv[])
 {
 	
 	int iNumero;
-	int i;
+	int iIterador;
+	int iPosicionDelElemento;
 
 	//Se llena el arreglo sin numero repetidos
-	for (i = 0; i < N; i++)
+	for (iIterador = 0; iIterador < TAMANIO; iIterador++)
 	{
 		do{
 			iNumero = rand() % 16384 + 1;
 		}while(fiRepetido(iNumero));
-		iArreglo[i] = iNumero;
+		aiArreglo[iIterador] = iNumero;
 		//vamos imprimiendo todos los numeros y sus indices 
 		//para comprobar que se esta haciendo correctamente la busqueda
 		//al momento de mirar los resultados
-		printf("[%i]=%i ",i+1,iArreglo[i]);
-		if(i % 10 == 0) printf("\n");
+		printf("[%i]=%i ",iIterador+1,aiArreglo[iIterador]);
+		if(iIterador % 10 == 0) printf("\n");
 	}
 	printf("\n");
 
@@ -50,13 +51,13 @@ int main(int argc, char const *argv[])
 	scanf("%i",&iNumeroABuscar);
 
 	//se ejecuta el procedimiento para buscar el elemento y obtener la posicion en el arreglo
-	int posicionDelElemento = fiBusquedaSecuencialHilos();
+	iPosicionDelElemento = fiBusquedaSecuencialHilos();
 
 	//obtenida la posicion, se evalua si es correcta. Si lo es, se imprimira la posicion.
-	if(posicionDelElemento == 0)
+	if(iPosicionDelElemento == 0)
 		printf("No se encontro el elemento\n");
 	else
-		printf("La posicion del elemento en el arreglo es: %i\n",posicionDelElemento);
+		printf("La posicion del elemento en el arreglo es: %i\n",iPosicionDelElemento);
 
 	exit(0);
 }
@@ -64,102 +65,105 @@ int main(int argc, char const *argv[])
 //funcion pedida para buscar el elemento en el arreglo
 int fiBusquedaSecuencialHilos()
 {
-  	int posicion = -1;
+  	int iPosicion = -1;
   	//funcion que lanza los 4 hilos para hacer la busqueda,
   	//se hace paso de valor por referencia para que sea usada por los 4 hilos y alguno la modifique
-  	lanzarHilos(&posicion);
+  	fvlanzarHilos(&iPosicion);
   	//habiendose modificado la variable posicion en alguno de los hilos se retorna la misma.
-  	return posicion + 1;
+  	return iPosicion + 1;
 }
 
-void lanzarHilos( int *p)
+void fvlanzarHilos( int *p)
 {
-	pthread_t hilo1;
-  	pthread_t hilo2;
-  	pthread_t hilo3;
-  	pthread_t hilo4;
+	pthread_t ptHilo1;
+  	pthread_t ptHilo2;
+  	pthread_t ptHilo3;
 
-  	int * pos = p;
-  	int iHilo1, iHilo2, iHilo3, iHilo4;
+  	int * piPosicion = p;
+  	int iRetH1, iRetH2, iRetH3;
 
   	//Se crean los hilos en busqueda del elemento
-  	iHilo1 = pthread_create( &hilo1, NULL, hiloBusqueda1, (void *)pos );
-  	iHilo2 = pthread_create( &hilo2, NULL, hiloBusqueda2, (void *)pos );
-  	iHilo3 = pthread_create( &hilo3, NULL, hiloBusqueda3, (void *)pos );
+  	iRetH1 = pthread_create( &ptHilo1, NULL, fpvhiloBusqueda1, (void *)piPosicion );
+  	iRetH2 = pthread_create( &ptHilo2, NULL, fpvhiloBusqueda2, (void *)piPosicion );
+  	iRetH3 = pthread_create( &ptHilo3, NULL, fpvhiloBusqueda3, (void *)piPosicion );
   	
-  	hiloBusqueda4(pos);
+  	fvhiloBusqueda4(piPosicion);
 
-  	pthread_join( hilo1, NULL );
-  	pthread_join( hilo2, NULL );
- 	pthread_join( hilo3, NULL );
+  	pthread_join( ptHilo1, NULL );
+  	pthread_join( ptHilo2, NULL );
+ 	pthread_join( ptHilo3, NULL );
   		
 }
 
-void * hiloBusqueda1( void *h )
+void * fpvhiloBusqueda1( void *h )
 {
-	int * posEncontrado = (int *) h;
-	int i = 0;
-	while(!iEncontro && i < 1024)
+	//pasamos la direccion al puntero para poder modificar la variable posicion definida en fiBusquedaSecuencialHilos
+	int * piPosEncontrado = (int *) h;
+	int iIterador = 0;
+	while(!iEncontro && iIterador < 1024)
 	{
-		if(iArreglo[i] == iNumeroABuscar) 
+		if(aiArreglo[iIterador] == iNumeroABuscar) 
 		{
 			iEncontro = 1;
-			*posEncontrado = i;
+			*piPosEncontrado = iIterador;// una vez encontrado se modifica la variable posicion
 		}
-		i++;
+		iIterador++;
 	}
 }
-void * hiloBusqueda2( void *h )
+void * fpvhiloBusqueda2( void *h )
 {
-	int * posEncontrado = (int *) h;
-	int i = 1024;
-	while(!iEncontro && i < 2048)
+	//pasamos la direccion al puntero para poder modificar la variable posicion definida en fiBusquedaSecuencialHilos
+	int * piPosEncontrado = (int *) h;
+	int iIterador = 1024;
+	while(!iEncontro && iIterador < 2048)
 	{
-		if(iArreglo[i] == iNumeroABuscar) 
+		if(aiArreglo[iIterador] == iNumeroABuscar) 
 		{
 			iEncontro = 1;
-			*posEncontrado = i;
+			*piPosEncontrado = iIterador;// una vez encontrado se modifica la variable posicion
 		}
-		i++;
+		iIterador++;
 	}
 }
-void * hiloBusqueda3( void *h )
+void * fpvhiloBusqueda3( void *h )
 {
-	int * posEncontrado = (int *) h;
-	int i = 2048;
-	while(!iEncontro && i < 3072)
+	//pasamos la direccion al puntero para poder modificar la variable posicion definida en fiBusquedaSecuencialHilos
+	int * piPosEncontrado = (int *) h;
+	int iIterador = 2048;
+	while(!iEncontro && iIterador < 3072)
 	{
-		if(iArreglo[i] == iNumeroABuscar) 
+		if(aiArreglo[iIterador] == iNumeroABuscar) 
 		{
 			iEncontro = 1;
-			*posEncontrado = i;
+			*piPosEncontrado = iIterador;// una vez encontrado se modifica la variable posicion
 		}
-		i++;
+		iIterador++;
 	}
 }
-void hiloBusqueda4(int *p)
+void fvhiloBusqueda4(int *p)
 {
-	int * posEncontrado = p;
-	int i = 3072;
-	while(!iEncontro && i < 4096)
+	//pasamos la direccion al puntero para poder modificar la variable posicion definida en fiBusquedaSecuencialHilos
+	int * piPosEncontrado = p;
+	int iIterador = 3072;
+	while(!iEncontro && iIterador < 4096)
 	{
-		if(iArreglo[i] == iNumeroABuscar) 
+		if(aiArreglo[iIterador] == iNumeroABuscar) 
 		{
 			iEncontro = 1;
-			*posEncontrado = i;
+			*piPosEncontrado = iIterador;// una vez encontrado se modifica la variable posicion
 		}
-		i++;
+		iIterador++;
 	}
 }
 //funcion para saber si un numero ya esta en el arreglo y asi evitar ingresar alguno repetido
-int fiRepetido(int iNumero)
+int fiRepetido(int iNumBuscado)
 {
-	int i = 0;
-	int encontrado = 0;
-	while(!encontrado && i < N)
+	int iIterador = 0;
+	int iFueEncontrado = 0;
+	while(!iFueEncontrado && iIterador < TAMANIO)
 	{
-		if(iArreglo[i] == iNumero) encontrado = 1;
-		i++;
+		if(aiArreglo[iIterador] == iNumBuscado) iFueEncontrado = 1;
+		iIterador++;
 	}
-	return encontrado;
+	return iFueEncontrado;
 }
