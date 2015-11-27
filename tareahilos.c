@@ -37,8 +37,13 @@ int main(int argc, char const *argv[])
 			iNumero = rand() % 16384 + 1;
 		}while(fiRepetido(iNumero));
 		iArreglo[i] = iNumero;
-		printf("(%i)[%i]\n",i+1,iArreglo[i]);
+		//vamos imprimiendo todos los numeros y sus indices 
+		//para comprobar que se esta haciendo correctamente la busqueda
+		//al momento de mirar los resultados
+		printf("[%i]=%i ",i+1,iArreglo[i]);
+		if(i % 10 == 0) printf("\n");
 	}
+	printf("\n");
 
 	//Se pide el elemento a buscar en el arreglo
 	printf("Ingrese numero a buscar: ");
